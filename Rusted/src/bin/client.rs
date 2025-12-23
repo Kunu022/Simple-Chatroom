@@ -132,7 +132,7 @@ async fn main() {
                         format!("[{}] {} > {}", msg.time, msg.username, msg.content)
                     }
                     MessageType::ServerMessage => {
-                        format!("*** {} ***", msg.content)
+                        format!("*** {} ", msg.content)
                     }
                     MessageType::UserList => continue,
                 };
@@ -185,10 +185,8 @@ extern "C" fn handle_username(ptr: *const c_char) {
 
 
 //connecting and initial username sending
-async fn connect_and_setup() -> (
-    tokio::net::tcp::OwnedReadHalf,
-    tokio::net::tcp::OwnedWriteHalf,
-) {
+async fn connect_and_setup() -> (tokio::net::tcp::OwnedReadHalf, tokio::net::tcp::OwnedWriteHalf,) {
+    //let stream = TcpStream::connect("192.168.0.11:8082")
     let stream = TcpStream::connect("127.0.0.1:8082")
         .await
         .expect("Failed to connect");

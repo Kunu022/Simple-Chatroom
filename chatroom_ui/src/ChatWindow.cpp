@@ -137,6 +137,13 @@ ChatWindow::ChatWindow(QWidget *parent): QWidget(parent) {
     }
     });
 
+    connect(inputBox, &QLineEdit::returnPressed, this, [this]() {
+    if (!inputBox->text().isEmpty() && g_send_callback) {
+        g_send_callback(inputBox->text().toUtf8().constData());
+        inputBox->clear();
+    }
+});
+
 }
 
 void ChatWindow::addUserMessage(const QString &msg) {

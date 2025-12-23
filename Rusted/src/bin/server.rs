@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //online user list
     USERS.set(Arc::new(Mutex::new(HashMap::new()))).ok();
 
-    let listener = TcpListener::bind("127.0.0.1:8082").await?;
+    let listener = TcpListener::bind("0.0.0.0:8082").await?;
     println!("listening on {}", listener.local_addr()?);
     //buffer
     let (tx, _) = broadcast::channel::<String>(100);
@@ -63,7 +63,6 @@ async fn handle_connection(socket: TcpStream, tx: broadcast::Sender<String>, mut
     if let Ok(_) = reader.read_line(&mut username).await{
         let username = username.trim().to_string();
 
-        println!("handling conection server side");
         //update and broadcast userlist
         let addr = writer.as_ref().peer_addr().unwrap_or_else(|_| "0.0.0.0:0".parse().unwrap());
         USERS.get()
@@ -81,7 +80,7 @@ async fn handle_connection(socket: TcpStream, tx: broadcast::Sender<String>, mut
             time: Local::now().format("%H:%M:%S").to_string(),
             message_type: MessageType::ServerMessage,
         };
-        let join_json = serde_json::to_string(&join_msg).unwrap() + "\n";  // CHANGE 2: add \n
+        let join_json = serde_json::to_string(&join_msg).unwrap() + "\n";
         tx.send(join_json).unwrap();
 
         let mut line = String::new();
@@ -117,7 +116,7 @@ async fn handle_connection(socket: TcpStream, tx: broadcast::Sender<String>, mut
                     }
                 }
 
-                //send message to clients
+                //send message to client
                 result = rx.recv() => {
                     let msg = result.unwrap();
                     if let Err(e) = writer.write_all(msg.as_bytes()).await {
